@@ -56,13 +56,13 @@ export const validateAttribute = (attribute, attributes) => {
         error.value = 'Please specify the attribute value'
     } else {
         if (attribute.name) {
-            const attProps = attributes.find(att => att.name === attribute.name);
-            if(attProps && attProps.type) {
-                if (!fieldValidationByType(attribute.value, attProps.type, attribute.operator)) {
-                    error.value = 'Please specify the valid attribute value' ;
-                }
+            // const attProps = attributes.find(att => att.name === attribute.name);
+            // if(attProps && attProps.type) {
+            //     if (!fieldValidationByType(attribute.value, attProps.type, attribute.operator)) {
+            //         error.value = 'Please specify the valid attribute value' ;
+            //     }
                
-            }
+            // }
         }
     }
 

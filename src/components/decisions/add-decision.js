@@ -41,7 +41,7 @@ class AddDecision extends Component {
         super(props);
 
         const outcome = props.editDecision ? props.outcome : ({ value: '', error: {}, params: []});
-        const addAttribute = { error: {}, name: '', operator: '', value: ''};
+        const addAttribute = { error: {}, name: '',name2:'', operator: '', value: ''};
         const node = props.editDecision ? props.editCondition.node : {};
         const activeNode = { index: 0, depth: 0 };
 
@@ -60,6 +60,7 @@ class AddDecision extends Component {
              activeNodeDepth: [activeNode] };
         this.handleAdd = this.handleAdd.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.onChangeFact= this.onChangeFact.bind(this);
         this.onChangeNewFact = this.onChangeNewFact.bind(this);
         this.onChangeOutcomeValue = this.onChangeOutcomeValue.bind(this);
         this.handleTopNode = this.handleTopNode.bind(this);
@@ -84,6 +85,7 @@ class AddDecision extends Component {
                 outcomeParams[param.pkey] = param.pvalue;
             })
             const condition = transformTreeToRule(this.state.node, this.state.outcome, outcomeParams);
+            console.log('condition from home '+condition.conditions.all[0].fact);
             this.props.addCondition(condition);
         }
     }
@@ -92,6 +94,13 @@ class AddDecision extends Component {
         this.props.cancel();
     }
  
+    onChangeFact(e,name)
+    {
+        const addAttribute = { ...this.state.addAttribute };
+        addAttribute[name]=e.target.value;
+        console.log(addAttribute[name]);
+        this.setState({ addAttribute });
+    }
      onChangeNewFact(e, name) {
          const addAttribute = { ...this.state.addAttribute };
          addAttribute[name] = e.target.value;
@@ -154,18 +163,17 @@ class AddDecision extends Component {
 
     mapNodeName(val) {
         const node = {};
-        const { addAttribute: { name, operator, value, path }, attributes } = this.state;
+        const { addAttribute: { name,name2, operator, value, path }, attributes } = this.state;
         if (val === 'Add All' || val === 'Add Any') {
             node['name'] = val === 'Add All' ? 'all' : 'any';
             node['nodeSvgShape'] = nodeStyle;
             node['children'] = [];
         } else {
             node['name'] = name;
+            node['name2']=name2
             let factValue = value.trim();
             const attProps = attributes.find(att => att.name === name);
-            if (attProps.type === 'number') {
-                factValue = Number(value.trim());
-            }
+            
             let fact = { [operator]: factValue };
             if (path) {
                 fact['path'] = `.${path}`;
@@ -181,9 +189,11 @@ class AddDecision extends Component {
             this.setState({enableFieldView: true});
         } else {
             const { activeNodeDepth, node, attributes } = this.state;
-            const addAttribute = { error: {}, name: '', operator: '', value: ''};
+            const addAttribute = { error: {}, name: '',name2:'', operator: '', value: ''};
             if (value === 'Add fact node') {
+                console.log('before: '+addAttribute.name);
                 const error = validateAttribute(this.state.addAttribute, attributes);
+                console.log('after: '+addAttribute.name);
                 if (Object.keys(error).length > 0 ) {
                     let addAttribute = this.state.addAttribute;
                     addAttribute.error = error;
@@ -193,9 +203,7 @@ class AddDecision extends Component {
             }
             if (activeNodeDepth && node) {
                 const newNode = { ...node };
-
                 const getActiveNode = (pNode, depthIndex) => pNode[depthIndex];
-                
                 let activeNode = newNode;
                 const cloneDepth = value === 'Remove' ? activeNodeDepth.slice(0, activeNodeDepth.length -1 ): [ ...activeNodeDepth ] 
                 cloneDepth.forEach(nodeDepth => {
@@ -212,7 +220,7 @@ class AddDecision extends Component {
                     factOptions = this.state.factsButton.map(button =>
                         ({ ...button, disable: true }));
                 }
-                
+                console.log(addAttribute);
                 this.setState({node: newNode, enableFieldView: false, addAttribute, factsButton: factOptions});
             }
         }
@@ -243,7 +251,7 @@ class AddDecision extends Component {
     }
 
     handleFieldCancel() {
-        const addAttribute = { error: {}, name: '', operator: '', value: ''};
+        const addAttribute = { error: {}, name: PropTypes.array, operator: '', value: ''};
         this.setState({ enableFieldView: false, addAttribute });
     }
 
@@ -286,10 +294,6 @@ class AddDecision extends Component {
         const attribute = addAttribute.name && attributes.find(attr => attr.name === addAttribute.name);
         const operatorOptions = attribute && operator[attribute.type];
         const { background } = this.context;
-
-        const placeholder = addAttribute.operator === 'contains' || addAttribute.operator === 'doesNotContain' ?
-         PLACEHOLDER['string'] : PLACEHOLDER[attribute.type]
-
         return (<Panel>
             
             <div className={`attributes-header ${background}`}>
@@ -299,12 +303,14 @@ class AddDecision extends Component {
             </div>
 
             <div className="add-field-panel">
-                <div><SelectField options={attributeOptions} onChange={(e) => this.onChangeNewFact(e, 'name')}
-                        value={addAttribute.name} error={addAttribute.error.name} label="Facts"/></div>
-                <div><SelectField options={operatorOptions} onChange={(e) => this.onChangeNewFact(e, 'operator')}
-                        value={addAttribute.operator} error={addAttribute.error.operator} label="Operator"/></div>
+            <div>
+            <InputField onChange={(value) => this.onChangeFact(value, 'name')}
+                         label="Expression" />
+            </div>
+                <div><InputField onChange={(value) => this.onChangeFact(value, 'operator')}
+                         label="Operator" /></div>
                 <div><InputField onChange={(value) => this.onChangeNewFact(value, 'value')} value={addAttribute.value}
-                        error={addAttribute.error.value} label="Value" placeholder={placeholder}/></div>
+                        error={addAttribute.error.value} label="Value" /></div>
             </div>
 
             { addPathflag && <div className="add-field-panel half-width">

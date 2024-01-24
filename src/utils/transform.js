@@ -62,7 +62,8 @@ export const transformRuleToTree = (conditions = []) => {
 };
 
 const mapChildNodeToFacts = (children) => {
-    const fact = { fact: children.name };
+    console.log("here: "+children.name);
+    const fact = { fact: children.name};
     Object.keys(children.attributes).forEach((key) => {
         if (key === 'path') {
             fact['path'] = children.attributes.path;
@@ -77,16 +78,18 @@ const mapChildNodeToFacts = (children) => {
             fact['value'] = value;
         }
     });
+    console.log("taken: "+fact.fact);
     return fact;
 }
 
 const mapNodeToCondition = (node) => {
     const parentNode = { [node.name]: [] };
-
+    console.log(Object.keys(node.children));
     if (node.children && node.children.length > 0) {
         const facts = node.children.map((childNode) => {
             if (childNode.name !== 'all' && childNode.name !== 'any') {
-                return mapChildNodeToFacts(childNode);
+                const m=mapChildNodeToFacts(childNode);
+                return m;
             } else {
                 return mapNodeToCondition(childNode);
             }

@@ -41,7 +41,7 @@
     "font-awesome": "4.7.0",
     "history": "4.10.1",
     "html-webpack-plugin": "5.5.0",
-    "json-rules-engine": "6.1.2",
+    "json-rules-engine": "^6.1.2",
     "lodash": "4.17.21",
     "mini-css-extract-plugin": "2.6.1",
     "node-sass": "8.0.0",
@@ -64,8 +64,8 @@
     "webpack-cli": "4.10.0"
   },
   "devDependencies": {
-    "@hot-loader/react-dom": "16.13.0",
     "@babel/eslint-parser": "7.19.1",
+    "@hot-loader/react-dom": "16.13.0",
     "eslint": "8.27.0",
     "eslint-plugin-react": "7.31.10",
     "husky": "8.0.2",
